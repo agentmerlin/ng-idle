@@ -1,6 +1,7 @@
-/*** Directives and services for responding to idle users in AngularJS
+/*** WARNING: This is a fork of the original project. See the below URL for the source project
+* Directives and services for responding to idle users in AngularJS
 * @author Mike Grabski <me@mikegrabski.com>
-* @version v1.1.0
+* @version v1.2.0
 * @link https://github.com/HackedByChinese/ng-idle.git
 * @license MIT
 */
@@ -10,22 +11,7 @@ angular.module('ngIdle', ['ngIdle.keepalive', 'ngIdle.idle', 'ngIdle.countdown',
 angular.module('ngIdle.keepalive', [])
   .provider('Keepalive', function() {
     var options = {
-      http: null,
       interval: 10 * 60
-    };
-
-    this.http = function(value) {
-      if (!value) throw new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.');
-      if (angular.isString(value)) {
-        value = {
-          url: value,
-          method: 'GET'
-        };
-      }
-
-      value.cache = false;
-
-      options.http = value;
     };
 
     var setInterval = this.interval = function(seconds) {
@@ -35,25 +21,15 @@ angular.module('ngIdle.keepalive', [])
       options.interval = seconds;
     };
 
-    this.$get = ['$rootScope', '$log', '$interval', '$http',
-      function($rootScope, $log, $interval, $http) {
+    this.$get = ['$rootScope', '$log', '$interval',
+      function($rootScope, $log, $interval) {
 
         var state = {
           ping: null
         };
 
-        function handleResponse(data, status) {
-          $rootScope.$broadcast('KeepaliveResponse', data, status);
-        }
-
         function ping() {
           $rootScope.$broadcast('Keepalive');
-
-          if (angular.isObject(options.http)) {
-            $http(options.http)
-              .success(handleResponse)
-              .error(handleResponse);
-          }
         }
 
         return {
@@ -286,8 +262,20 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
-        $document.find('body').on(options.interrupt, function() {
-          svc.interrupt();
+        $document.find('body').on(options.interrupt, function(event) {
+          /*
+            note:
+              webkit fires fake mousemove events when the user has done nothing, so the idle will never time out while the cursor is over the webpage
+              Original webkit bug report which caused this issue:
+                https://bugs.webkit.org/show_bug.cgi?id=17052
+              Chromium bug reports for issue:
+                https://code.google.com/p/chromium/issues/detail?id=5598
+                https://code.google.com/p/chromium/issues/detail?id=241476
+                https://code.google.com/p/chromium/issues/detail?id=317007
+          */
+          if (event.type !== 'mousemove' || (event.movementX || event.movementY)) {
+            svc.interrupt();
+          }
         });
 
         var wrap = function(event) {
