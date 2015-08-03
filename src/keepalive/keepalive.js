@@ -1,22 +1,7 @@
 angular.module('ngIdle.keepalive', [])
   .provider('Keepalive', function() {
     var options = {
-      http: null,
       interval: 10 * 60
-    };
-
-    this.http = function(value) {
-      if (!value) throw new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.');
-      if (angular.isString(value)) {
-        value = {
-          url: value,
-          method: 'GET'
-        };
-      }
-
-      value.cache = false;
-
-      options.http = value;
     };
 
     var setInterval = this.interval = function(seconds) {
@@ -26,25 +11,15 @@ angular.module('ngIdle.keepalive', [])
       options.interval = seconds;
     };
 
-    this.$get = ['$rootScope', '$log', '$interval', '$http',
-      function($rootScope, $log, $interval, $http) {
+    this.$get = ['$rootScope', '$log', '$interval',
+      function($rootScope, $log, $interval) {
 
         var state = {
           ping: null
         };
 
-        function handleResponse(data, status) {
-          $rootScope.$broadcast('KeepaliveResponse', data, status);
-        }
-
         function ping() {
           $rootScope.$broadcast('Keepalive');
-
-          if (angular.isObject(options.http)) {
-            $http(options.http)
-              .success(handleResponse)
-              .error(handleResponse);
-          }
         }
 
         return {

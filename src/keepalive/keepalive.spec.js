@@ -42,35 +42,6 @@ describe('ngIdle', function() {
     };
 
     describe('KeepaliveProvider', function() {
-      it('http() should update options with simple GET', function() {
-        KeepaliveProvider.http('/path/to/keepalive');
-
-        expect(create()._options().http).toEqualData({
-          url: '/path/to/keepalive',
-          method: 'GET',
-          cache: false
-        });
-      });
-
-      it('http() should update options with http options object', function() {
-        KeepaliveProvider.http({
-          url: '/path/to/keepalive',
-          method: 'POST',
-          cache: true
-        });
-
-        expect(create()._options().http).toEqualData({
-          url: '/path/to/keepalive',
-          method: 'POST',
-          cache: false
-        });
-      });
-
-      it('http() should throw if passed null or undefined argument', function() {
-        expect(function() {
-          KeepaliveProvider.http();
-        }).toThrow(new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.'));
-      });
 
       it('interval() should update options', function() {
         KeepaliveProvider.interval(10);
@@ -153,40 +124,6 @@ describe('ngIdle', function() {
         $interval.flush(DEFAULTKEEPALIVEINTERVAL);
 
         expect($rootScope.$broadcast).toHaveBeenCalledWith('Keepalive');
-      });
-
-      it('should invoke a URL when pinged and broadcast KeepaliveResponse on success.', function() {
-        spyOn($rootScope, '$broadcast');
-
-        Keepalive = create('/path/to/keepalive');
-
-        Keepalive.start();
-
-        $httpBackend.expectGET('/path/to/keepalive')
-        .respond(200);
-
-        $interval.flush(DEFAULTKEEPALIVEINTERVAL);
-
-        $httpBackend.flush();
-
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('KeepaliveResponse', undefined, 200);
-      });
-
-      it('should invoke a URL when pinged and broadcast KeepaliveResponse on error.', function() {
-        spyOn($rootScope, '$broadcast');
-
-        Keepalive = create('/path/to/keepalive');
-
-        Keepalive.start();
-
-        $httpBackend.expectGET('/path/to/keepalive')
-        .respond(404);
-
-        $interval.flush(DEFAULTKEEPALIVEINTERVAL);
-
-        $httpBackend.flush();
-
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('KeepaliveResponse', undefined, 404);
       });
     });
   });
