@@ -12,7 +12,9 @@
     "user",
     "session"
   ],
-  "main": "angular-idle.js",
+  "main": [
+    "angular-idle.js"
+  ],
   "scripts": {
     "test": "grunt test"
   },

@@ -3,7 +3,9 @@
   "version": "1.1.0",
   "homepage": "https://github.com/HackedByChinese/ng-idle",
   "description": "Responding to idle users in AngularJS",
-  "main": "angular-idle.js",
+  "main": [
+    "angular-idle.js"
+  ],
   "keywords": [
     "angularjs",
     "idle",
