@@ -7,6 +7,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     banner: '/**' +
+      '* WARNING: This is a fork of the original project. See the below URL for the source project\n' +
       '* <%= pkg.description %>\n' +
       '* @author <%= pkg.author %>\n' +
       '* @version v<%= pkg.version %>\n' +
